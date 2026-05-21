@@ -320,7 +320,7 @@
 
         /* ================= CHAT VIEW ================= */
         #view-chat { 
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             display: none; flex-direction: column; z-index: 500;
             background-color: #87CEEB; background-size: cover; background-position: center; 
         }
@@ -1813,7 +1813,7 @@
             <div style="display: flex; gap: 12px; align-items: flex-end; width: 100%;">
                 <button class="circle-btn plus-btn" onclick="toggleAttachMenu(event)"><i class="fas fa-plus"></i></button>
                 <div class="chat-input-wrapper">
-                    <textarea class="chat-input" id="chatInput" placeholder="iMessage信息" rows="1" oninput="autoResize(this); toggleSendIcon();" onkeydown="handleEnter(event, sendMessage)" onblur="setTimeout(() => { window.scrollTo(0,0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 100);"></textarea>
+                    <textarea class="chat-input" id="chatInput" placeholder="iMessage信息" rows="1" oninput="autoResize(this); toggleSendIcon();" onkeydown="handleEnter(event, sendMessage)" onblur="handleChatInputBlur()"></textarea>
                     <button class="send-btn" id="sendBtn" onclick="handleSendOrAi()"><i class="fas fa-microphone"></i></button>
                 </div>
             </div>
@@ -3087,6 +3087,19 @@
 <script>
     // --- Global State ---
     let currentChatContactId = 'main';
+
+    function handleChatInputBlur() {
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+            const viewContainer = document.querySelector('.view-container');
+            if (viewContainer) viewContainer.scrollTop = 0;
+        }, 10);
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+        }, 300);
+    }
     let currentMemoryContactId = 'main';
     let chatHistory = [];
     let isOnlineMode = true;
@@ -3623,6 +3636,10 @@
     }
 
     function closeChat() {
+        const activeElement = document.activeElement;
+        if (activeElement) {
+            activeElement.blur();
+        }
         document.getElementById('view-chat').classList.remove('active');
         document.getElementById('view-messages').classList.add('active');
         document.getElementById('wechat-dock').style.display = 'flex';
@@ -3631,7 +3648,12 @@
             window.scrollTo(0, 0);
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
-        }, 100);
+            const viewContainer = document.querySelector('.view-container');
+            if (viewContainer) viewContainer.scrollTop = 0;
+        }, 10);
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+        }, 300);
     }
 
     function editUserName() {
