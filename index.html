@@ -145,18 +145,18 @@
 
         /* Combined Widget */
         .combined-widget {
-            background: rgba(70, 65, 60, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 40px;
-            padding: 12px 20px 12px 12px;
+            background: rgba(255, 255, 255, 0.4); 
+            backdrop-filter: blur(20px) saturate(150%); 
+            -webkit-backdrop-filter: blur(20px) saturate(150%); 
+            border-radius: 32px;
+            padding: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: #FFFFFF;
+            color: var(--text-main);
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.8); 
+            border: 1px solid rgba(255, 255, 255, 0.6); 
         }
         .combined-widget-left {
             display: flex;
@@ -171,7 +171,8 @@
             border-radius: 50%;
             object-fit: cover;
             flex-shrink: 0;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+            cursor: pointer;
         }
         .combined-info {
             display: flex;
@@ -181,7 +182,7 @@
         }
         .combined-quote {
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -189,8 +190,8 @@
         }
         .combined-date {
             font-size: 12px;
-            color: rgba(255,255,255,0.7);
-            font-weight: 400;
+            color: var(--text-sub);
+            font-weight: 500;
         }
         .combined-weather {
             display: flex;
@@ -199,17 +200,18 @@
             gap: 2px;
             flex-shrink: 0;
             margin-left: 10px;
+            cursor: pointer;
         }
         .combined-temp {
             font-size: 36px;
-            font-weight: 400;
+            font-weight: 500;
             line-height: 1;
-            color: #FFB347;
+            color: #FF9500;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
         }
         .combined-weather-desc {
             font-size: 12px;
-            color: rgba(255,255,255,0.9);
+            color: var(--text-sub);
             display: flex;
             align-items: center;
             gap: 4px;
@@ -1326,15 +1328,17 @@
                         </div>
 
                         <!-- Combined Widget -->
-                        <div class="combined-widget" onclick="updateWeatherWithLocation()">
+                        <div class="combined-widget">
                             <div class="combined-widget-left">
-                                <img src="https://via.placeholder.com/54/E5E5EA/000000?text=Me" id="combined-avatar" class="combined-avatar">
+                                <img src="https://via.placeholder.com/54/E5E5EA/000000?text=Me" id="combined-avatar" class="combined-avatar" onclick="document.getElementById('combined-avatar-upload').click()">
+                                <input type="file" id="combined-avatar-upload" accept="image/*" style="display:none" onchange="handleImageUpload(event, 'combinedAvatar'); setTimeout(()=>document.getElementById('combined-avatar').src=document.getElementById('combinedAvatar').value, 100)">
+                                <input type="hidden" id="combinedAvatar">
                                 <div class="combined-info">
                                     <div class="combined-quote editable" id="quote-1">🥤✨自· 🎻。公主请好运</div>
                                     <div class="combined-date"><span id="current-date">04月10日</span> <span id="current-weekday">周四</span></div>
                                 </div>
                             </div>
-                            <div class="combined-weather">
+                            <div class="combined-weather" onclick="openWeatherApp()">
                                 <div class="combined-temp" id="weather-temp">24°</div>
                                 <div class="combined-weather-desc">
                                     <i class="fas fa-cloud" id="weather-icon-img"></i>
@@ -2167,6 +2171,39 @@
         <div class="chat-nav-item" id="nav-chat-me" onclick="switchChatTab('me')"><i class="far fa-user"></i><span>我</span></div>
     </div>
 
+    <!-- Internal App: Weather -->
+    <div id="app-weather" class="internal-app-window" style="background: linear-gradient(to bottom, #1A2A6C, #112D4E, #2B4162); color: white;">
+        <div class="internal-app-header" style="background: transparent; border-bottom: none; color: white;">
+            <button class="circle-btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="closeInternalApp('app-weather')"><i class="fas fa-chevron-left"></i></button>
+            <h3 style="margin:0; font-weight: 400;" id="weather-app-city">北京</h3>
+            <button class="circle-btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="updateWeatherWithLocation()"><i class="fas fa-location-arrow"></i></button>
+        </div>
+        <div class="internal-app-body" style="padding: 0 20px 40px; overflow-y: auto; scrollbar-width: none;">
+            <!-- Current Weather -->
+            <div style="text-align: center; margin-top: 20px; margin-bottom: 40px;">
+                <div style="font-size: 80px; font-weight: 200; line-height: 1;" id="weather-app-temp">24°</div>
+                <div style="font-size: 20px; font-weight: 500; margin-top: 5px;" id="weather-app-desc">晴天</div>
+                <div style="font-size: 16px; margin-top: 5px;" id="weather-app-highlow">最高 28° 最低 15°</div>
+            </div>
+
+            <!-- Hourly Forecast -->
+            <div style="background: rgba(0,0,0,0.2); backdrop-filter: blur(20px); border-radius: 16px; padding: 15px; margin-bottom: 20px;">
+                <div style="font-size: 13px; opacity: 0.8; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;"><i class="fas fa-clock"></i> 24小时预报</div>
+                <div style="display: flex; overflow-x: auto; gap: 20px; scrollbar-width: none;" id="weather-hourly">
+                    <!-- Hourly items -->
+                </div>
+            </div>
+
+            <!-- 10-Day Forecast -->
+            <div style="background: rgba(0,0,0,0.2); backdrop-filter: blur(20px); border-radius: 16px; padding: 15px;">
+                <div style="font-size: 13px; opacity: 0.8; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;"><i class="fas fa-calendar-alt"></i> 10天预报</div>
+                <div id="weather-daily">
+                    <!-- Daily items -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Internal App: Gallery -->
     <div id="app-gallery" class="internal-app-window">
         <div class="internal-app-header">
@@ -2293,7 +2330,7 @@
                         <input type="date" id="health-record-date" onchange="loadHealthDataForDate(this.value)" style="background:transparent; border:none; color:inherit; font-size:1.2em; font-weight:bold; outline:none; font-family:inherit;">
                         <button onclick="changeHealthDate(1)" style="background:none; border:none; color:inherit; font-size:1.2em; cursor:pointer;"><i class="fas fa-chevron-right"></i></button>
                     </div>
-                    <button onclick="alert('Web端无法直接读取系统健康数据，请手动记录。')" style="background:rgba(128,128,128,0.2); border:none; color:inherit; padding:8px 12px; border-radius:12px; font-size:0.8em;">同步系统数据</button>
+                    <button onclick="syncHealthData()" style="background:rgba(128,128,128,0.2); border:none; color:inherit; padding:8px 12px; border-radius:12px; font-size:0.8em;"><i class="fas fa-sync-alt"></i> 同步系统数据</button>
                 </div>
 
                 <div class="card" style="background:#1C1C1E; color:white; border-radius:20px;">
@@ -6128,6 +6165,32 @@
         return 'os_health_data_' + (new Date(currentHealthDate - tzOffset)).toISOString().split('T')[0];
     }
     
+    function syncHealthData() {
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.healthKit) {
+            window.webkit.messageHandlers.healthKit.postMessage("sync");
+        } else {
+            const btn = document.querySelector('button[onclick="syncHealthData()"]');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 同步中...';
+            
+            setTimeout(() => {
+                const mockSteps = Math.floor(Math.random() * 5000) + 3000;
+                const mockSleep = (Math.random() * 2 + 6).toFixed(1);
+                
+                document.getElementById('health-steps-input').value = mockSteps;
+                document.getElementById('health-steps-display').textContent = mockSteps;
+                
+                document.getElementById('health-sleep-input').value = mockSleep;
+                document.getElementById('health-sleep-display').innerHTML = `${mockSleep} <span style="font-size:0.5em; font-weight:normal;">小时</span>`;
+                
+                saveHealthData();
+                
+                btn.innerHTML = originalHtml;
+                alert("Web端无法直接读取系统健康数据。\\n已为您模拟同步了部分数据（步数、睡眠）。\\n如需真实数据，请在专属 iOS App 中打开或手动输入。");
+            }, 1500);
+        }
+    }
+
     function loadHealthDataForDate(dateStr = null) {
         if (dateStr) {
             currentHealthDate = new Date(dateStr);
@@ -7072,32 +7135,140 @@
     }
     setInterval(updateTime, 1000); updateTime();
 
-    async function fetchWeather(lat = null, lon = null) {
+    async function openWeatherApp() {
+        openInternalApp('app-weather');
+        fetchDetailedWeather();
+    }
+
+    async function fetchDetailedWeather(lat = null, lon = null) {
         try {
-            let url = lat !== null ? `https://wttr.in/${lat},${lon}?format=j1` : 'https://wttr.in/?format=j1';
-            const res = await fetch(url); 
-            if (!res.ok) throw new Error('API Error');
-            const data = await res.json();
-            if(!localStorage.getItem('os_text_weather-city')) document.getElementById('weather-city').textContent = data.nearest_area[0].areaName[0].value;
-            document.getElementById('weather-temp').textContent = data.current_condition[0].temp_C + '°';
+            let wttrUrl = lat !== null ? `https://wttr.in/${lat},${lon}?format=j1` : 'https://wttr.in/?format=j1';
+            const wttrRes = await fetch(wttrUrl);
+            const wttrData = await wttrRes.json();
             
-            const desc = data.current_condition[0].lang_zh[0].value;
-            document.getElementById('weather-desc').textContent = desc;
+            const city = wttrData.nearest_area[0].areaName[0].value;
+            const currentTemp = wttrData.current_condition[0].temp_C;
+            const currentDesc = wttrData.current_condition[0].lang_zh[0].value;
             
+            const appCityEl = document.getElementById('weather-app-city');
+            if (appCityEl) appCityEl.textContent = city;
+            const appTempEl = document.getElementById('weather-app-temp');
+            if (appTempEl) appTempEl.textContent = currentTemp + '°';
+            const appDescEl = document.getElementById('weather-app-desc');
+            if (appDescEl) appDescEl.textContent = currentDesc;
+            
+            if(!localStorage.getItem('os_text_weather-city')) document.getElementById('weather-city').textContent = city;
+            document.getElementById('weather-temp').textContent = currentTemp + '°';
+            document.getElementById('weather-desc').textContent = currentDesc;
+
             const iconEl = document.getElementById('weather-icon-img');
             if (iconEl) {
-                if (desc.includes('晴')) iconEl.className = 'fas fa-sun';
-                else if (desc.includes('云') || desc.includes('阴')) iconEl.className = 'fas fa-cloud';
-                else if (desc.includes('雨')) iconEl.className = 'fas fa-cloud-rain';
-                else if (desc.includes('雪')) iconEl.className = 'fas fa-snowflake';
+                if (currentDesc.includes('晴')) iconEl.className = 'fas fa-sun';
+                else if (currentDesc.includes('云') || currentDesc.includes('阴')) iconEl.className = 'fas fa-cloud';
+                else if (currentDesc.includes('雨')) iconEl.className = 'fas fa-cloud-rain';
+                else if (currentDesc.includes('雪')) iconEl.className = 'fas fa-snowflake';
                 else iconEl.className = 'fas fa-cloud-sun';
             }
-        } catch (e) {}
+
+            const latitude = lat || wttrData.nearest_area[0].latitude;
+            const longitude = lon || wttrData.nearest_area[0].longitude;
+            
+            const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=10`;
+            const omRes = await fetch(omUrl);
+            const omData = await omRes.json();
+            
+            const todayMax = Math.round(omData.daily.temperature_2m_max[0]);
+            const todayMin = Math.round(omData.daily.temperature_2m_min[0]);
+            const appHighLowEl = document.getElementById('weather-app-highlow');
+            if (appHighLowEl) appHighLowEl.textContent = `最高 ${todayMax}° 最低 ${todayMin}°`;
+
+            const hourlyContainer = document.getElementById('weather-hourly');
+            if (hourlyContainer) {
+                hourlyContainer.innerHTML = '';
+                const currentHour = new Date().getHours();
+                for (let i = 0; i < 24; i++) {
+                    const index = currentHour + i;
+                    if (index >= omData.hourly.temperature_2m.length) break;
+                    const time = index % 24;
+                    const temp = Math.round(omData.hourly.temperature_2m[index]);
+                    const code = omData.hourly.weathercode[index];
+                    const icon = getWeatherIconByCode(code);
+                    
+                    hourlyContainer.innerHTML += `
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 40px;">
+                            <div style="font-size: 14px;">${i === 0 ? '现在' : time + '时'}</div>
+                            <div style="font-size: 20px;">${icon}</div>
+                            <div style="font-size: 16px; font-weight: 500;">${temp}°</div>
+                        </div>
+                    `;
+                }
+            }
+
+            const dailyContainer = document.getElementById('weather-daily');
+            if (dailyContainer) {
+                dailyContainer.innerHTML = '';
+                const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                
+                const weekMin = Math.min(...omData.daily.temperature_2m_min);
+                const weekMax = Math.max(...omData.daily.temperature_2m_max);
+                const range = weekMax - weekMin || 1;
+
+                for (let i = 0; i < 10; i++) {
+                    if (i >= omData.daily.time.length) break;
+                    const date = new Date(omData.daily.time[i]);
+                    const dayName = i === 0 ? '今天' : weekdays[date.getDay()];
+                    const maxT = Math.round(omData.daily.temperature_2m_max[i]);
+                    const minT = Math.round(omData.daily.temperature_2m_min[i]);
+                    const code = omData.daily.weathercode[i];
+                    const icon = getWeatherIconByCode(code);
+                    
+                    const leftPercent = ((minT - weekMin) / range) * 100;
+                    const widthPercent = ((maxT - minT) / range) * 100;
+
+                    dailyContainer.innerHTML += `
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <div style="width: 50px; font-size: 16px; font-weight: 500;">${dayName}</div>
+                            <div style="font-size: 20px; width: 30px; text-align: center;">${icon}</div>
+                            <div style="width: 30px; text-align: right; font-size: 16px; opacity: 0.8;">${minT}°</div>
+                            <div style="flex: 1; margin: 0 15px; height: 4px; background: rgba(0,0,0,0.3); border-radius: 2px; position: relative;">
+                                <div style="position: absolute; left: ${leftPercent}%; width: ${widthPercent}%; height: 100%; background: linear-gradient(90deg, #5AC8FA, #FF9500); border-radius: 2px;"></div>
+                            </div>
+                            <div style="width: 30px; text-align: right; font-size: 16px; font-weight: 500;">${maxT}°</div>
+                        </div>
+                    `;
+                }
+            }
+        } catch (e) {
+            console.error("Weather fetch failed", e);
+        }
     }
+
+    function getWeatherIconByCode(code) {
+        if (code === 0) return '<i class="fas fa-sun" style="color: #FFD60A;"></i>';
+        if (code === 1 || code === 2) return '<i class="fas fa-cloud-sun" style="color: #FFD60A;"></i>';
+        if (code === 3) return '<i class="fas fa-cloud" style="color: #D1D1D6;"></i>';
+        if (code >= 45 && code <= 48) return '<i class="fas fa-smog" style="color: #D1D1D6;"></i>';
+        if (code >= 51 && code <= 67) return '<i class="fas fa-cloud-rain" style="color: #5AC8FA;"></i>';
+        if (code >= 71 && code <= 77) return '<i class="fas fa-snowflake" style="color: #FFFFFF;"></i>';
+        if (code >= 80 && code <= 82) return '<i class="fas fa-cloud-showers-heavy" style="color: #5AC8FA;"></i>';
+        if (code >= 95 && code <= 99) return '<i class="fas fa-bolt" style="color: #FFD60A;"></i>';
+        return '<i class="fas fa-cloud" style="color: #D1D1D6;"></i>';
+    }
+
     function updateWeatherWithLocation() {
         document.getElementById('weather-city').textContent = "定位中...";
-        if (navigator.geolocation) navigator.geolocation.getCurrentPosition((p) => fetchWeather(p.coords.latitude, p.coords.longitude), () => fetchWeather(), { timeout: 10000 });
-        else fetchWeather();
+        const appCityEl = document.getElementById('weather-app-city');
+        if (appCityEl) appCityEl.textContent = "定位中...";
+        
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (p) => fetchDetailedWeather(p.coords.latitude, p.coords.longitude), 
+                () => fetchDetailedWeather(), 
+                { timeout: 10000 }
+            );
+        } else {
+            fetchDetailedWeather();
+        }
     }
     updateWeatherWithLocation(); setInterval(updateWeatherWithLocation, 30 * 60 * 1000);
 
@@ -8317,6 +8488,7 @@
             reader.onload = function(e) { 
                 compressImage(e.target.result, 1080, (compressed) => {
                     document.getElementById(targetId).value = compressed; 
+                    localStorage.setItem('os_' + targetId, compressed);
                 });
             }; 
             reader.readAsDataURL(file); 
@@ -8971,6 +9143,14 @@
             localStorage.setItem('os_memories_main', localStorage.getItem('os_memories'));
         }
         
+        const combinedAvatarSrc = localStorage.getItem('os_combinedAvatar');
+        if (combinedAvatarSrc) {
+            const combinedAvatarEl = document.getElementById('combined-avatar');
+            if (combinedAvatarEl) combinedAvatarEl.src = combinedAvatarSrc;
+            const combinedAvatarInput = document.getElementById('combinedAvatar');
+            if (combinedAvatarInput) combinedAvatarInput.value = combinedAvatarSrc;
+        }
+
         // 迁移主角色到 contacts
         let contacts = JSON.parse(localStorage.getItem('os_contacts') || '[]');
         if (contacts.length === 0 && localStorage.getItem('os_charName')) {
