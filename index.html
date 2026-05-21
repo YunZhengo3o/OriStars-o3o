@@ -1813,7 +1813,7 @@
             <div style="display: flex; gap: 12px; align-items: flex-end; width: 100%;">
                 <button class="circle-btn plus-btn" onclick="toggleAttachMenu(event)"><i class="fas fa-plus"></i></button>
                 <div class="chat-input-wrapper">
-                    <textarea class="chat-input" id="chatInput" placeholder="iMessage信息" rows="1" oninput="autoResize(this); toggleSendIcon();" onkeydown="handleEnter(event, sendMessage)" onblur="window.scrollTo(0,0); document.body.scrollLeft = 0;"></textarea>
+                    <textarea class="chat-input" id="chatInput" placeholder="iMessage信息" rows="1" oninput="autoResize(this); toggleSendIcon();" onkeydown="handleEnter(event, sendMessage)" onblur="setTimeout(() => { window.scrollTo(0,0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }, 100);"></textarea>
                     <button class="send-btn" id="sendBtn" onclick="handleSendOrAi()"><i class="fas fa-microphone"></i></button>
                 </div>
             </div>
@@ -2515,7 +2515,7 @@
     </div>
 
     <!-- Update Notice Modal -->
-    <div id="update-notice-modal" class="modern-modal-overlay" style="z-index: 9999; display: none;">
+    <div id="update-notice-modal" class="modern-modal-overlay" style="z-index: 9999;">
         <div class="modern-card" style="width: 90%; max-width: 400px; padding: 0; overflow: hidden; background: #fff;">
             <div style="background: linear-gradient(135deg, #007AFF, #5856D6); padding: 20px; text-align: center; color: white;">
                 <i class="fas fa-rocket" style="font-size: 32px; margin-bottom: 10px;"></i>
@@ -3601,6 +3601,15 @@
 
     function openChat(contactId) {
         currentChatContactId = contactId;
+        
+        let contacts = JSON.parse(localStorage.getItem('os_contacts') || '[]');
+        const contact = contacts.find(c => c.id === contactId);
+        if (contact) {
+            isOnlineMode = !(contact.isOfflineMode || false);
+        } else {
+            isOnlineMode = true;
+        }
+        
         loadChatHistory();
         
         applyCustomStyles();
@@ -3618,8 +3627,11 @@
         document.getElementById('view-messages').classList.add('active');
         document.getElementById('wechat-dock').style.display = 'flex';
         renderMessagesList();
-        window.scrollTo(0, 0);
-        document.body.scrollLeft = 0;
+        setTimeout(() => {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 100);
     }
 
     function editUserName() {
@@ -7720,6 +7732,7 @@
         let offlineAllowSteal = false;
         let offlineAllowNpc = false;
         let offlineStyleId = 'default';
+        let isOfflineMode = false;
 
         let contacts = JSON.parse(localStorage.getItem('os_contacts') || '[]');
         const contact = contacts.find(c => c.id === currentChatContactId);
@@ -7746,7 +7759,10 @@
             offlineAllowSteal = contact.offlineAllowSteal || false;
             offlineAllowNpc = contact.offlineAllowNpc || false;
             offlineStyleId = contact.offlineStyleId || 'default';
+            isOfflineMode = contact.isOfflineMode || false;
         }
+
+        isOnlineMode = !isOfflineMode;
 
         document.getElementById('charName').value = charName;
         document.getElementById('charRealName').value = charRealName;
@@ -7835,6 +7851,7 @@
         const offlineAllowSteal = document.getElementById('offlineAllowSteal') ? document.getElementById('offlineAllowSteal').checked : false;
         const offlineAllowNpc = document.getElementById('offlineAllowNpc') ? document.getElementById('offlineAllowNpc').checked : false;
         const offlineStyleId = document.getElementById('offlineStyleSelect') ? document.getElementById('offlineStyleSelect').value : 'default';
+        const isOfflineMode = document.getElementById('chat-mode-switch') ? document.getElementById('chat-mode-switch').checked : false;
 
         let contacts = JSON.parse(localStorage.getItem('os_contacts') || '[]');
         const contactIndex = contacts.findIndex(c => c.id === currentChatContactId);
@@ -7861,6 +7878,7 @@
             contacts[contactIndex].offlineAllowSteal = offlineAllowSteal;
             contacts[contactIndex].offlineAllowNpc = offlineAllowNpc;
             contacts[contactIndex].offlineStyleId = offlineStyleId;
+            contacts[contactIndex].isOfflineMode = isOfflineMode;
             
             localStorage.setItem('os_contacts', JSON.stringify(contacts));
         }
@@ -8786,14 +8804,14 @@
     }
 
     function closeUpdateNotice() {
-        document.getElementById('update-notice-modal').style.display = 'none';
+        document.getElementById('update-notice-modal').classList.remove('show');
         localStorage.setItem('os_update_notice_20260521', 'true');
     }
 
     function checkUpdateNotice() {
         const hasSeen = localStorage.getItem('os_update_notice_20260521');
         if (!hasSeen) {
-            document.getElementById('update-notice-modal').style.display = 'flex';
+            document.getElementById('update-notice-modal').classList.add('show');
         }
     }
 
