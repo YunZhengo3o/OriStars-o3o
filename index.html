@@ -500,6 +500,23 @@
         #chat-select-bar button { background: none; border: none; font-size: 1em; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
 
         /* Health App Specific */
+        #app-health {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
+        }
+        #app-health.show {
+            display: flex;
+            transform: translateY(0);
+        }
         #app-health .internal-app-header {
             background: transparent;
             border-bottom: none;
@@ -6126,13 +6143,38 @@
     }
     
     function syncHealthData() {
+        const btn = document.querySelector('button[onclick="syncHealthData()"]');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 同步中...';
+        
         if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.healthKit) {
             window.webkit.messageHandlers.healthKit.postMessage("sync");
-        } else {
-            const btn = document.querySelector('button[onclick="syncHealthData()"]');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 同步中...';
+            // 监听来自 iOS 的回调
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.type === 'healthData') {
+                    const data = event.data.payload;
+                    if (data.steps) {
+                        document.getElementById('health-steps-input').value = data.steps;
+                        document.getElementById('health-steps-display').textContent = data.steps;
+                    }
+                    if (data.sleep) {
+                        document.getElementById('health-sleep-input').value = data.sleep;
+                        document.getElementById('health-sleep-display').innerHTML = `${data.sleep} <span style="font-size:0.5em; font-weight:normal;">小时</span>`;
+                    }
+                    saveHealthData();
+                    btn.innerHTML = originalHtml;
+                    alert("健康数据同步成功！");
+                }
+            }, { once: true });
             
+            // 设置超时
+            setTimeout(() => {
+                if (btn.innerHTML.includes('同步中')) {
+                    btn.innerHTML = originalHtml;
+                    alert("同步超时，请检查 iOS 端权限设置。");
+                }
+            }, 5000);
+        } else {
             setTimeout(() => {
                 const mockSteps = Math.floor(Math.random() * 5000) + 3000;
                 const mockSleep = (Math.random() * 2 + 6).toFixed(1);
@@ -7107,7 +7149,22 @@
             const currentTemp = wttrData.current_condition[0].temp_C;
             const currentDesc = wttrData.current_condition[0].lang_zh[0].value;
             
-            const savedCity = localStorage.getItem('os_text_weather-city') || '北京';
+            // 尝试从 wttrData 获取中文城市名
+            let cityName = '北京';
+            if (wttrData.nearest_area && wttrData.nearest_area[0] && wttrData.nearest_area[0].areaName && wttrData.nearest_area[0].areaName[0]) {
+                cityName = wttrData.nearest_area[0].areaName[0].value;
+                // 简单的英文到中文映射，如果 wttr.in 返回英文
+                const cityMap = {
+                    'Beijing': '北京', 'Shanghai': '上海', 'Guangzhou': '广州', 'Shenzhen': '深圳',
+                    'Chengdu': '成都', 'Hangzhou': '杭州', 'Wuhan': '武汉', 'Chongqing': '重庆',
+                    'Nanjing': '南京', 'Tianjin': '天津', 'Suzhou': '苏州', 'Xi\'an': '西安'
+                };
+                if (cityMap[cityName]) {
+                    cityName = cityMap[cityName];
+                }
+            }
+            
+            const savedCity = localStorage.getItem('os_text_weather-city') || cityName;
             const appCityEl = document.getElementById('weather-app-city');
             if (appCityEl) appCityEl.textContent = savedCity;
             const appTempEl = document.getElementById('weather-app-temp');
