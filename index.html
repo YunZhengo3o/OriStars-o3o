@@ -7130,7 +7130,7 @@
         
         const clockTopDate = document.getElementById('clock-top-date');
         if (clockTopDate) {
-            clockTopDate.textContent = `${monthStr}${weekdayStr}`;
+            clockTopDate.textContent = `${monthStr}月${dateStr}日 ${weekdayStr}`;
         }
     }
     setInterval(updateTime, 1000); updateTime();
@@ -7147,7 +7147,7 @@
             const wttrData = await wttrRes.json();
             
             const currentTemp = wttrData.current_condition[0].temp_C;
-            const currentDesc = wttrData.current_condition[0].lang_zh[0].value;
+            const currentDesc = wttrData.current_condition[0].lang_zh ? wttrData.current_condition[0].lang_zh[0].value : wttrData.current_condition[0].weatherDesc[0].value;
             
             // 尝试从 wttrData 获取中文城市名
             let cityName = '北京';
@@ -7157,11 +7157,43 @@
                 const cityMap = {
                     'Beijing': '北京', 'Shanghai': '上海', 'Guangzhou': '广州', 'Shenzhen': '深圳',
                     'Chengdu': '成都', 'Hangzhou': '杭州', 'Wuhan': '武汉', 'Chongqing': '重庆',
-                    'Nanjing': '南京', 'Tianjin': '天津', 'Suzhou': '苏州', 'Xi\'an': '西安'
+                    'Nanjing': '南京', 'Tianjin': '天津', 'Suzhou': '苏州', 'Xi\'an': '西安',
+                    'Hong Kong': '香港', 'Macau': '澳门', 'Taipei': '台北', 'Dongguan': '东莞',
+                    'Qingdao': '青岛', 'Shenyang': '青岛', 'Dalian': '大连', 'Xiamen': '厦门',
+                    'Zhengzhou': '郑州', 'Changsha': '长沙', 'Jinan': '济南', 'Harbin': '哈尔滨',
+                    'Shijiazhuang': '石家庄', 'Changchun': '长春', 'Hefei': '合肥', 'Fuzhou': '福州'
                 };
                 if (cityMap[cityName]) {
                     cityName = cityMap[cityName];
                 }
+            }
+            
+            // 简单的英文天气描述到中文映射
+            const weatherDescMap = {
+                'Sunny': '晴天', 'Clear': '晴天', 'Partly cloudy': '多云', 'Cloudy': '多云', 'Overcast': '阴天',
+                'Mist': '雾', 'Patchy rain possible': '局部有雨', 'Patchy snow possible': '局部有雪',
+                'Patchy sleet possible': '局部有雨夹雪', 'Patchy freezing drizzle possible': '局部有冻毛毛雨',
+                'Thundery outbreaks possible': '可能有雷暴', 'Blowing snow': '吹雪', 'Blizzard': '暴风雪',
+                'Fog': '雾', 'Freezing fog': '冻雾', 'Patchy light drizzle': '局部有轻微毛毛雨',
+                'Light drizzle': '轻微毛毛雨', 'Freezing drizzle': '冻毛毛雨', 'Heavy freezing drizzle': '强冻毛毛雨',
+                'Patchy light rain': '局部有小雨', 'Light rain': '小雨', 'Moderate rain at times': '时有中雨',
+                'Moderate rain': '中雨', 'Heavy rain at times': '时有大雨', 'Heavy rain': '大雨',
+                'Light freezing rain': '轻微冻雨', 'Moderate or heavy freezing rain': '中度或强冻雨',
+                'Light sleet': '轻微雨夹雪', 'Moderate or heavy sleet': '中度或强雨夹雪',
+                'Patchy light snow': '局部有小雪', 'Light snow': '小雪', 'Patchy moderate snow': '局部有中雪',
+                'Moderate snow': '中雪', 'Patchy heavy snow': '局部有大雪', 'Heavy snow': '大雪',
+                'Ice pellets': '冰粒', 'Light rain shower': '阵雨', 'Moderate or heavy rain shower': '中度或强阵雨',
+                'Torrential rain shower': '暴雨', 'Light sleet showers': '轻微阵雨夹雪',
+                'Moderate or heavy sleet showers': '中度或强阵雨夹雪', 'Light snow showers': '小阵雪',
+                'Moderate or heavy snow showers': '中度或强阵雪', 'Light showers of ice pellets': '轻微冰粒阵雨',
+                'Moderate or heavy showers of ice pellets': '中度或强冰粒阵雨', 'Patchy light rain with thunder': '局部有小雨伴雷暴',
+                'Moderate or heavy rain with thunder': '中度或强雨伴雷暴', 'Patchy light snow with thunder': '局部有小雪伴雷暴',
+                'Moderate or heavy snow with thunder': '中度或强雪伴雷暴'
+            };
+            
+            let finalDesc = currentDesc;
+            if (weatherDescMap[currentDesc]) {
+                finalDesc = weatherDescMap[currentDesc];
             }
             
             const savedCity = localStorage.getItem('os_text_weather-city') || cityName;
@@ -7170,18 +7202,18 @@
             const appTempEl = document.getElementById('weather-app-temp');
             if (appTempEl) appTempEl.textContent = currentTemp + '°';
             const appDescEl = document.getElementById('weather-app-desc');
-            if (appDescEl) appDescEl.textContent = currentDesc;
+            if (appDescEl) appDescEl.textContent = finalDesc;
             
             document.getElementById('weather-city').textContent = savedCity;
             document.getElementById('weather-temp').textContent = currentTemp + '°';
-            document.getElementById('weather-desc').textContent = currentDesc;
+            document.getElementById('weather-desc').textContent = finalDesc;
 
             const iconEl = document.getElementById('weather-icon-img');
             if (iconEl) {
-                if (currentDesc.includes('晴')) iconEl.className = 'fas fa-sun';
-                else if (currentDesc.includes('云') || currentDesc.includes('阴')) iconEl.className = 'fas fa-cloud';
-                else if (currentDesc.includes('雨')) iconEl.className = 'fas fa-cloud-rain';
-                else if (currentDesc.includes('雪')) iconEl.className = 'fas fa-snowflake';
+                if (finalDesc.includes('晴')) iconEl.className = 'fas fa-sun';
+                else if (finalDesc.includes('云') || finalDesc.includes('阴')) iconEl.className = 'fas fa-cloud';
+                else if (finalDesc.includes('雨')) iconEl.className = 'fas fa-cloud-rain';
+                else if (finalDesc.includes('雪')) iconEl.className = 'fas fa-snowflake';
                 else iconEl.className = 'fas fa-cloud-sun';
             }
 
