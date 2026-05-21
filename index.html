@@ -117,35 +117,114 @@
         .names { font-size: 2.4em; font-weight: 700; margin-bottom: 5px; font-family: 'Dancing Script', cursive; letter-spacing: 1px;}
         .days-together { font-size: 0.95em; color: var(--text-main); font-weight: 500;}
 
-        .widget-row { display: flex; gap: 16px; margin-bottom: 16px; }
-        .widget-half { 
-            flex: 1; 
-            background: rgba(255, 255, 255, 0.4); 
-            backdrop-filter: blur(20px) saturate(150%); 
-            -webkit-backdrop-filter: blur(20px) saturate(150%); 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
-            border-radius: var(--radius); 
-            padding: 16px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.8); 
-            display: flex; flex-direction: column; justify-content: space-between;
+        /* Huge Clock Widget */
+        .huge-clock-widget {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
         }
-        
-        .time-widget .time-display { font-size: 2.4em; font-weight: 300; letter-spacing: -1px; line-height: 1; margin-bottom: 5px;}
-        .time-widget .date-display { font-size: 0.85em; color: var(--text-sub); font-weight: 500;}
+        .huge-clock-top {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: -5px;
+            letter-spacing: 1px;
+        }
+        .huge-clock-time {
+            font-size: 85px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+        .huge-clock-bottom {
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
 
-        .weather-widget { position: relative; overflow: hidden; background: linear-gradient(135deg, #87CEEB, #4A90E2); color: white;}
-        .weather-widget .weather-icon { font-size: 2em; margin-bottom: 5px; }
-        .weather-widget .weather-temp { font-size: 2em; font-weight: 300; line-height: 1; margin-bottom: 2px;}
-        .weather-widget .weather-city { font-size: 0.9em; font-weight: 600; opacity: 0.95;}
-        .weather-widget .weather-desc { font-size: 0.8em; opacity: 0.85;}
+        /* Combined Widget */
+        .combined-widget {
+            background: rgba(70, 65, 60, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 12px 20px 12px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .combined-widget-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        .combined-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .combined-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+        .combined-quote {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .combined-date {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 400;
+        }
+        .combined-weather {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        .combined-temp {
+            font-size: 36px;
+            font-weight: 400;
+            line-height: 1;
+            color: #FFB347;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+        }
+        .combined-weather-desc {
+            font-size: 12px;
+            color: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
 
-        .quotes-card { text-align: center; padding: 24px 16px; font-family: serif;}
-        .quotes-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-        .quotes-container::-webkit-scrollbar { display: none; }
-        .quote-item { flex: 0 0 100%; scroll-snap-align: start; font-size: 1.1em; color: var(--text-main); line-height: 1.5;}
-        .quote-dots { display: flex; justify-content: center; gap: 6px; margin-top: 16px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: #E5E5EA; transition: background 0.3s; }
-        .dot.active { background: var(--text-main); }
+        /* Standalone Quote */
+        .standalone-quote {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
 
         /* Grid */
         .grid-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 10px; margin-bottom: 24px; padding: 0 5px; min-height: 100px;}
@@ -1239,26 +1318,35 @@
                 <!-- Page 1 -->
                 <div class="home-page" id="page-1">
                     <div id="widget-container" style="margin-top: 10px;">
-                        <div class="widget-row">
-                            <div class="widget-half time-widget">
-                                <div class="time-display" id="current-time">00:00</div>
-                                <div class="date-display"><span id="current-date">1月1日</span> <span id="current-weekday">星期一</span></div>
-                            </div>
-                            <div class="widget-half weather-widget" onclick="updateWeatherWithLocation()" style="cursor: pointer;">
-                                <div class="weather-icon"><i class="fas fa-cloud-sun" id="weather-icon-img"></i></div>
-                                <div class="weather-temp" id="weather-temp">--°</div>
-                                <div class="weather-city editable" id="weather-city">获取中...</div>
-                                <div class="weather-desc" id="weather-desc">--</div>
-                            </div>
+                        <!-- Huge Clock Widget -->
+                        <div class="huge-clock-widget">
+                            <div class="huge-clock-top"><span id="clock-top-date">04周三</span> ˚ ₊‧ Ɛ১ ☆ ໒3 ‧₊ ˚</div>
+                            <div class="huge-clock-time" id="current-time">18:58</div>
+                            <div class="huge-clock-bottom"><span class="editable" id="clock-bottom-text">热爱漫无边际 生活自有分寸</span></div>
                         </div>
 
-                        <div class="card quotes-card">
-                            <div class="quotes-container" id="quotes-container">
-                                <div class="quote-item"><span class="editable" id="quote-1">每一次心跳，都在诉说对你的思念。</span><i class="fas fa-magic ai-btn" onclick="generateAIContent('请生成一句简短的温柔治愈的恋爱语录（20字以内），直接输出语录内容，不要加引号和其他废话。', 'quote-1')"></i></div>
-                                <div class="quote-item"><span class="editable" id="quote-2">想和你一起看遍世间所有的日落。</span><i class="fas fa-magic ai-btn" onclick="generateAIContent('请生成一句简短的温柔治愈的恋爱语录（20字以内），直接输出语录内容，不要加引号和其他废话。', 'quote-2')"></i></div>
-                                <div class="quote-item"><span class="editable" id="quote-3">你是我平淡生活里的那一束光。</span><i class="fas fa-magic ai-btn" onclick="generateAIContent('请生成一句简短的温柔治愈的恋爱语录（20字以内），直接输出语录内容，不要加引号和其他废话。', 'quote-3')"></i></div>
+                        <!-- Combined Widget -->
+                        <div class="combined-widget" onclick="updateWeatherWithLocation()">
+                            <div class="combined-widget-left">
+                                <img src="https://via.placeholder.com/54/E5E5EA/000000?text=Me" id="combined-avatar" class="combined-avatar">
+                                <div class="combined-info">
+                                    <div class="combined-quote editable" id="quote-1">🥤✨自· 🎻。公主请好运</div>
+                                    <div class="combined-date"><span id="current-date">04月10日</span> <span id="current-weekday">周四</span></div>
+                                </div>
                             </div>
-                            <div class="quote-dots" id="quote-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+                            <div class="combined-weather">
+                                <div class="combined-temp" id="weather-temp">24°</div>
+                                <div class="combined-weather-desc">
+                                    <i class="fas fa-cloud" id="weather-icon-img"></i>
+                                    <span class="editable" id="weather-city">北京</span> · <span id="weather-desc">晴天</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Standalone Short Sentence -->
+                        <div class="standalone-quote">
+                            <span class="editable" id="quote-2">₊⁺♡_祝森活鱼块ᴗ</span>
+                            <i class="fas fa-magic ai-btn" onclick="generateAIContent('请生成一句简短的颜文字可爱语录（15字以内），直接输出语录内容，不要加引号和其他废话。', 'quote-2')"></i>
                         </div>
                     </div>
 
@@ -3671,6 +3759,8 @@
         document.getElementById('me-user-name').textContent = userName;
         if (s.userAvatar) {
             document.getElementById('me-user-avatar').src = s.userAvatar;
+            const combinedAvatar = document.getElementById('combined-avatar');
+            if (combinedAvatar) combinedAvatar.src = s.userAvatar;
         }
         
         // 更新当前面具名称
@@ -6966,8 +7056,19 @@
     function updateTime() {
         const now = new Date();
         document.getElementById('current-time').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        document.getElementById('current-date').textContent = `${now.getMonth() + 1}月${now.getDate()}日`;
-        document.getElementById('current-weekday').textContent = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()];
+        
+        const monthStr = String(now.getMonth() + 1).padStart(2, '0');
+        const dateStr = String(now.getDate()).padStart(2, '0');
+        const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        const weekdayStr = weekdays[now.getDay()];
+        
+        document.getElementById('current-date').textContent = `${monthStr}月${dateStr}日`;
+        document.getElementById('current-weekday').textContent = weekdayStr;
+        
+        const clockTopDate = document.getElementById('clock-top-date');
+        if (clockTopDate) {
+            clockTopDate.textContent = `${monthStr}${weekdayStr}`;
+        }
     }
     setInterval(updateTime, 1000); updateTime();
 
@@ -6979,7 +7080,18 @@
             const data = await res.json();
             if(!localStorage.getItem('os_text_weather-city')) document.getElementById('weather-city').textContent = data.nearest_area[0].areaName[0].value;
             document.getElementById('weather-temp').textContent = data.current_condition[0].temp_C + '°';
-            document.getElementById('weather-desc').textContent = data.current_condition[0].lang_zh[0].value;
+            
+            const desc = data.current_condition[0].lang_zh[0].value;
+            document.getElementById('weather-desc').textContent = desc;
+            
+            const iconEl = document.getElementById('weather-icon-img');
+            if (iconEl) {
+                if (desc.includes('晴')) iconEl.className = 'fas fa-sun';
+                else if (desc.includes('云') || desc.includes('阴')) iconEl.className = 'fas fa-cloud';
+                else if (desc.includes('雨')) iconEl.className = 'fas fa-cloud-rain';
+                else if (desc.includes('雪')) iconEl.className = 'fas fa-snowflake';
+                else iconEl.className = 'fas fa-cloud-sun';
+            }
         } catch (e) {}
     }
     function updateWeatherWithLocation() {
@@ -6990,8 +7102,10 @@
     updateWeatherWithLocation(); setInterval(updateWeatherWithLocation, 30 * 60 * 1000);
 
     const quotesContainer = document.getElementById('quotes-container');
-    const dots = document.querySelectorAll('.dot');
-    quotesContainer.addEventListener('scroll', () => { const index = Math.round(quotesContainer.scrollLeft / quotesContainer.offsetWidth); dots.forEach((dot, i) => dot.classList.toggle('active', i === index)); });
+    if (quotesContainer) {
+        const dots = document.querySelectorAll('.dot');
+        quotesContainer.addEventListener('scroll', () => { const index = Math.round(quotesContainer.scrollLeft / quotesContainer.offsetWidth); dots.forEach((dot, i) => dot.classList.toggle('active', i === index)); });
+    }
 
     // new Chart(document.getElementById('healthChart').getContext('2d'), { type: 'line', data: { labels: ['一', '二', '三', '四', '五', '六', '日'], datasets: [{ label: '睡眠', data: [7, 6.5, 8, 7.5, 6, 8.5, 9], borderColor: '#007AFF', backgroundColor: 'rgba(0, 122, 255, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, max: 12 } } } });
 
@@ -7989,6 +8103,9 @@
         if (charAvatar) document.getElementById('chat-header-avatar').src = charAvatar; 
         else document.getElementById('chat-header-avatar').src = 'https://via.placeholder.com/50/E5E5EA/000000?text=AI';
         
+        const combinedAvatar = document.getElementById('combined-avatar');
+        if (combinedAvatar && s.userAvatar) combinedAvatar.src = s.userAvatar;
+
         const pinBtn = document.getElementById('btn-pin-chat');
         if (pinBtn) {
             pinBtn.style.color = isPinned ? '#FF9500' : 'white';
