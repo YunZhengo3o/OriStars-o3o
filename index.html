@@ -2514,6 +2514,28 @@
         </div>
     </div>
 
+    <!-- Update Notice Modal -->
+    <div id="update-notice-modal" class="modern-modal-overlay" style="z-index: 9999; display: none;">
+        <div class="modern-card" style="width: 90%; max-width: 400px; padding: 0; overflow: hidden; background: #fff;">
+            <div style="background: linear-gradient(135deg, #007AFF, #5856D6); padding: 20px; text-align: center; color: white;">
+                <i class="fas fa-rocket" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <div style="font-size: 20px; font-weight: 700;">版本更新提示</div>
+                <div style="font-size: 14px; opacity: 0.9; margin-top: 5px;" id="update-notice-date">2026-05-21</div>
+            </div>
+            <div style="padding: 20px; max-height: 50vh; overflow-y: auto; font-size: 15px; line-height: 1.6; color: #333;">
+                <div style="font-weight: 600; margin-bottom: 10px; color: #000;">本次更新内容：</div>
+                <ul style="padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+                    <li>在聊天界面的“+”号附件菜单中添加了“继续回复”按钮，点击后AI会接着剧情回复消息。</li>
+                    <li>在聊天设置（Persona Modal）中添加了调整聊天页面字体大小的功能。</li>
+                    <li>在线下模式高级设置中添加了“批量删除”按钮，可以批量删除自定义文风。</li>
+                </ul>
+            </div>
+            <div style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: center;">
+                <button onclick="closeUpdateNotice()" style="background: #007AFF; color: white; border: none; padding: 12px 24px; border-radius: 20px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s;">我已确认不再提醒</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Publish Moment Modal -->
     <div id="publish-moment-modal" class="modern-modal-overlay" style="align-items: flex-end;">
         <div class="modern-card" style="width: 100%; max-width: 100%; border-radius: 24px 24px 0 0; margin: 0; padding: 0; height: 85vh; display: flex; flex-direction: column;">
@@ -8763,6 +8785,18 @@
         }
     }
 
+    function closeUpdateNotice() {
+        document.getElementById('update-notice-modal').style.display = 'none';
+        localStorage.setItem('os_update_notice_20260521', 'true');
+    }
+
+    function checkUpdateNotice() {
+        const hasSeen = localStorage.getItem('os_update_notice_20260521');
+        if (!hasSeen) {
+            document.getElementById('update-notice-modal').style.display = 'flex';
+        }
+    }
+
     // Init
     async function initApp() {
         await loadFromBackend(); // 从后端恢复数据
@@ -8814,6 +8848,8 @@
         
         updateFriendRequestsUI();
         isAppInitialized = true;
+        
+        checkUpdateNotice();
     }
     
     initApp();
