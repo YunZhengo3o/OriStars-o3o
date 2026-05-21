@@ -836,21 +836,6 @@
         .star-particle { position: absolute; background: white; border-radius: 50%; animation: twinkle infinite alternate; }
         @keyframes twinkle { 0% { opacity: 0.2; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px white; } }
 
-        /* Notification Banner */
-        .notification-banner {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px; padding: 12px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex; align-items: center; gap: 12px; z-index: 9999;
-            transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(255,255,255,0.5); width: 90%; max-width: 400px;
-        }
-        .notification-banner.show { top: calc(var(--safe-top) + 10px); }
-        .notification-avatar { width: 40px; height: 40px; border-radius: 20px; object-fit: cover; }
-        .notification-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-        .notification-title { font-size: 15px; font-weight: 600; color: #000; margin-bottom: 2px; }
-        .notification-desc { font-size: 13px; color: #8E8E93; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
         /* Sticky Note Style for Inner Voice */
         .sticky-note {
             background: #FFF7D6; padding: 20px; border-radius: 2px 15px 15px 15px;
@@ -1920,15 +1905,6 @@
     </div>
     </div>
 
-    <!-- Notification Banner -->
-    <div class="notification-banner" id="notification-banner">
-        <img src="" id="notif-avatar" class="notification-avatar">
-        <div class="notification-content">
-            <div class="notification-title" id="notif-title">新消息</div>
-            <div class="notification-desc" id="notif-desc">...</div>
-        </div>
-    </div>
-
     <!-- User Mask Modal -->
     <div class="settings-modal" id="userMaskModal" style="z-index: 3000;">
         <div class="settings-modal-inner">
@@ -2621,6 +2597,37 @@
             <!-- Feed List -->
             <div id="moments-feed" style="padding: 0 0 40px 0;">
                 <!-- 动态渲染 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortcut Guide Modal -->
+    <div id="shortcut-guide-modal" class="modern-modal-overlay" style="z-index: 9999;">
+        <div class="modern-card" style="width: 90%; max-width: 400px; padding: 0; overflow: hidden; background: #fff;">
+            <div style="background: linear-gradient(135deg, #FF2D55, #FF3B30); padding: 20px; text-align: center; color: white;">
+                <i class="fas fa-heartbeat" style="font-size: 32px; margin-bottom: 10px;"></i>
+                <div style="font-size: 20px; font-weight: 700;">同步 iPhone 健康数据</div>
+            </div>
+            <div style="padding: 20px; max-height: 50vh; overflow-y: auto; font-size: 15px; line-height: 1.6; color: #333;">
+                <p>由于苹果的隐私限制，网页无法直接读取健康数据。您可以通过 iOS 的<strong>「快捷指令」</strong>来实现一键同步：</p>
+                <ol style="padding-left: 20px; margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                    <li>打开 iPhone 上的「快捷指令」App，新建一个快捷指令。</li>
+                    <li>添加操作：<strong>「查找健康样本」</strong>，类型选择「步数」。</li>
+                    <li>添加操作：<strong>「查找健康样本」</strong>，类型选择「睡眠分析」。</li>
+                    <li>添加操作：<strong>「在网页上运行 JavaScript」</strong>（需要允许 Safari 运行脚本）。</li>
+                    <li>在 JavaScript 框中输入以下代码：<br>
+                        <code style="background: #F2F2F7; padding: 8px; border-radius: 8px; display: block; margin-top: 5px; font-size: 12px; word-break: break-all;">
+                            var steps = 步数变量;<br>
+                            var sleep = 睡眠变量;<br>
+                            window.receiveHealthDataFromShortcut({steps: steps, sleep: sleep});<br>
+                            completion(true);
+                        </code>
+                    </li>
+                </ol>
+                <p style="margin-top: 10px; font-size: 13px; color: #8E8E93;">* 运行该快捷指令时，请确保当前 Safari 正打开着本网页。</p>
+            </div>
+            <div style="padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: center;">
+                <button onclick="document.getElementById('shortcut-guide-modal').classList.remove('show')" style="background: #FF2D55; color: white; border: none; padding: 12px 24px; border-radius: 20px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%;">我知道了</button>
             </div>
         </div>
     </div>
@@ -5244,16 +5251,6 @@
                 });
             }
         }
-
-        const banner = document.getElementById('notification-banner');
-        document.getElementById('notif-title').textContent = title;
-        document.getElementById('notif-desc').textContent = desc;
-        document.getElementById('notif-avatar').src = avatar || 'https://via.placeholder.com/40/E5E5EA/000000?text=AI';
-        
-        banner.classList.add('show');
-        setTimeout(() => {
-            banner.classList.remove('show');
-        }, 3000);
     }
 
     function showTyping() {
@@ -6153,6 +6150,19 @@
         return 'os_health_data_' + (new Date(currentHealthDate - tzOffset)).toISOString().split('T')[0];
     }
     
+    window.receiveHealthDataFromShortcut = function(data) {
+        if (data.steps) {
+            document.getElementById('health-steps-input').value = data.steps;
+            document.getElementById('health-steps-display').textContent = data.steps;
+        }
+        if (data.sleep) {
+            document.getElementById('health-sleep-input').value = data.sleep;
+            document.getElementById('health-sleep-display').innerHTML = `${data.sleep} <span style="font-size:0.5em; font-weight:normal;">小时</span>`;
+        }
+        saveHealthData();
+        alert("健康数据同步成功！");
+    };
+
     function syncHealthData() {
         const btn = document.querySelector('button[onclick="syncHealthData()"]');
         const originalHtml = btn.innerHTML;
@@ -6164,17 +6174,8 @@
             window.addEventListener('message', function(event) {
                 if (event.data && event.data.type === 'healthData') {
                     const data = event.data.payload;
-                    if (data.steps) {
-                        document.getElementById('health-steps-input').value = data.steps;
-                        document.getElementById('health-steps-display').textContent = data.steps;
-                    }
-                    if (data.sleep) {
-                        document.getElementById('health-sleep-input').value = data.sleep;
-                        document.getElementById('health-sleep-display').innerHTML = `${data.sleep} <span style="font-size:0.5em; font-weight:normal;">小时</span>`;
-                    }
-                    saveHealthData();
+                    window.receiveHealthDataFromShortcut(data);
                     btn.innerHTML = originalHtml;
-                    alert("健康数据同步成功！");
                 }
             }, { once: true });
             
@@ -6187,20 +6188,9 @@
             }, 5000);
         } else {
             setTimeout(() => {
-                const mockSteps = Math.floor(Math.random() * 5000) + 3000;
-                const mockSleep = (Math.random() * 2 + 6).toFixed(1);
-                
-                document.getElementById('health-steps-input').value = mockSteps;
-                document.getElementById('health-steps-display').textContent = mockSteps;
-                
-                document.getElementById('health-sleep-input').value = mockSleep;
-                document.getElementById('health-sleep-display').innerHTML = `${mockSleep} <span style="font-size:0.5em; font-weight:normal;">小时</span>`;
-                
-                saveHealthData();
-                
                 btn.innerHTML = originalHtml;
-                alert("Web端无法直接读取系统健康数据。\\n已为您模拟同步了部分数据（步数、睡眠）。\\n如需真实数据，请在专属 iOS App 中打开或手动输入。");
-            }, 1500);
+                document.getElementById('shortcut-guide-modal').classList.add('show');
+            }, 500);
         }
     }
 
@@ -6244,6 +6234,12 @@
             diet_dinner: document.getElementById('health-diet-dinner').value || ''
         };
         localStorage.setItem(key, JSON.stringify(data)); 
+        
+        // Update display values immediately
+        document.getElementById('health-steps-display').textContent = data.steps;
+        document.getElementById('health-sleep-display').innerHTML = `${data.sleep} <span style="font-size:0.5em; font-weight:normal;">小时</span>`;
+        document.getElementById('health-weight-display').innerHTML = `${data.weight} <span style="font-size:0.5em; font-weight:normal;">kg</span>`;
+        
         alert("健康数据已保存！");
         syncToBackend();
     }

@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+database.db
+database.sqlite
+server.log
+temp_script.js
+user_data.json
+memory_graph.json
